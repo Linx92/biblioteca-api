@@ -16,7 +16,6 @@ jobs:
                 version=$(grep -oPm1 "(?<=## \[)[^]]+" CHANGELOG.md)
                 echo "Extracted version: $version"
                 echo "VERSION=$version" >> $GITHUB_OUTPUT
-
     build:
         name: Build and push Docker image
         needs: extract-version
