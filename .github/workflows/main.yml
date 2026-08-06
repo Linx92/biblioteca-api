@@ -1,28 +1,44 @@
 name: Build and push imagen Dotnet
-on: 
-  workflow_disptach: {}
+
+on:
+  workflow_dispatch:
 
 jobs:
+  extract_version:
+    runs-on: ubuntu-latest
 
-    extract-version:
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v3
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
 
-            - name: Get version from changelog
-              id: extract_version
-              run: |
-                version=$(grep -oPm1 "(?<=## \[)[^]]+" CHANGELOG.md)
-                echo "Extracted version: $version"
-                echo "VERSION=$version" >> $GITHUB_OUTPUT
-    build:
-        name: Build and push Docker image
-        needs: extract-version
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v3
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-            - name: Validate build dockerfile
-              run: docker build -t mi-app:${{ steps.extract_version.outputs.VERSION }} .
+      - name: Get version from changelog
+        id: get_version
+        shell: bash
+        run: |
+          version=$(grep -oPm1 '(?<=## \[)[^]]+' CHANGELOG.md)
+
+          if [ -z "$version" ]; then
+            echo "No se pudo obtener la versión desde CHANGELOG.md"
+            exit 1
+          fi
+
+          echo "Extracted version: $version"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: Build Docker image
+    needs: extract_version
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Validate build Dockerfile
+        run: |
+          docker build \
+            -t "mi-app:${{ needs.extract_version.outputs.version }}" \
+            .
