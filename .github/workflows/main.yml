@@ -18,12 +18,12 @@ jobs:
                 echo "VERSION=$version" >> $GITHUB_OUTPUT
 
     build:
-        runs-on: ubuntu-latest
+        name: Build and push Docker image
         needs: extract-version
         runs-on: ubuntu-latest
         steps:
             - name: Checkout code
               uses: actions/checkout@v3
 
-            - name: Validate Dockerfile
-              run: docker build -f mi-app:${{ steps.extract_version.outputs.VERSION }} .
+            - name: Validate build dockerfile
+              run: docker build -t mi-app:${{ steps.extract_version.outputs.VERSION }} .
