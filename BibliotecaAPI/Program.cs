@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-// ¡rea de servicios
+// ÔøΩrea de servicios
 builder.Services.AddAutoMapper(
     cfg => { },
     typeof(Program)
@@ -20,13 +20,17 @@ builder.Services.AddDbContext<ApplicationDBContext>(options =>
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment()) 
-{
+// if (app.Environment.IsDevelopment()) 
+// {
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+//}
 
-//¡rea de middleware
+//√Årea de middleware
+app.Logger.LogInformation(
+    "Entorno actual: {Environment}",
+    app.Environment.EnvironmentName
+);
 app.UseLoguearRespuestaHTTP();
 
 app.MapControllers();

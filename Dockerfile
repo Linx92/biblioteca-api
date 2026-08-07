@@ -14,15 +14,14 @@ COPY . ./
 # Publicar la API
 RUN dotnet publish BibliotecaAPI/BibliotecaAPI.csproj \
     -c Release \
-    -o /app/out \
-    --no-restore
+    -o /app/out 
 
 # Etapa de ejecución
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 
 WORKDIR /app
 COPY --from=build /app/out ./
-
+ENV ASPNETCORE_ENVIRONMENT=Development
 ENV ASPNETCORE_HTTP_PORTS=8000
 
 EXPOSE 8000
